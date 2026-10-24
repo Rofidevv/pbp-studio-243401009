@@ -44,6 +44,8 @@ const daftarItem = [
   ItemBacklog('GYB-005', 'Foto produk lambat dimuat', 'bug', 2, 'To Do', null),
 ];
 
+const urutanStatus = ['To Do', 'In Progress', 'Review', 'Done'];
+
 class LayarGuyub extends StatelessWidget {
   const LayarGuyub({super.key});
 
@@ -92,8 +94,16 @@ class DetailKartu extends StatefulWidget {
 }
 
 class _DetailKartuState extends State<DetailKartu> {
+  late String status = widget.item.status;
+
   @override
   Widget build(BuildContext context) {
+    final sdhDone = status == 'Done';
+    final tnpPenangungJawab = widget.item.penanggungjawab == null;
+    final labelTombol = sdhDone
+        ? 'Sudah Done'
+        : 'Pindah ke ${urutanStatus[urutanStatus.indexOf(status) + 1]}';
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.item.code)),
       body: Padding(
@@ -101,15 +111,28 @@ class _DetailKartuState extends State<DetailKartu> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(widget.item.judul),
             Text(
-              '${widget.item.code} . ${widget.item.jenis} .'
+              '${widget.item.code} . ${widget.item.jenis} . '
               '${widget.item.poin} poin',
             ),
             Text(
               'Penangung Jawab: '
               '${widget.item.penanggungjawab ?? 'belum ada penangung jawab'}',
             ),
-            Text('Status: ${widget.item.status}'),
+            Text('Status: $status'),
+            ElevatedButton(
+              onPressed: (sdhDone || tnpPenangungJawab)
+                  ? null
+                  : () {
+                      setState(() {
+                        status = urutanStatus[urutanStatus.indexOf(status) + 1];
+                      });
+                    },
+              child: Text(labelTombol),
+            ),
+            if (tnpPenangungJawab)
+              Text('Kartu tanpa penangung jawab tidak bisa dipindahk'),
           ],
         ),
       ),
