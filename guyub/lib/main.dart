@@ -69,10 +69,50 @@ class DaftarKartu extends StatelessWidget {
           padding: EdgeInsetsGeometry.all(8),
           child: ListTile(
             title: Text(item.judul),
-            subtitle: Text('${item.code} - ${item.penanggungjawab ?? 'belum ada penanggung jawab'}  ${item.status}'),
+            subtitle: Text(
+              '${item.code} - ${item.penanggungjawab ?? 'belum ada penanggung jawab'}  ${item.status}',
+            ),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => DetailKartu(item: item)),
+            ),
           ),
         );
       },
+    );
+  }
+}
+
+class DetailKartu extends StatefulWidget {
+  const DetailKartu({super.key, required this.item});
+  final ItemBacklog item;
+
+  @override
+  State<DetailKartu> createState() => _DetailKartuState();
+}
+
+class _DetailKartuState extends State<DetailKartu> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(widget.item.code)),
+      body: Padding(
+        padding: EdgeInsetsGeometry.all(8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '${widget.item.code} . ${widget.item.jenis} .'
+              '${widget.item.poin} poin',
+            ),
+            Text(
+              'Penangung Jawab: '
+              '${widget.item.penanggungjawab ?? 'belum ada penangung jawab'}',
+            ),
+            Text('Status: ${widget.item.status}'),
+          ],
+        ),
+      ),
     );
   }
 }
