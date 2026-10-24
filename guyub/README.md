@@ -15,3 +15,9 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+## Catatan AI
+
+- **Alat:** oh my pi.
+- **Bagian yang dibantu:** memahami spesifikasi Studio Guyub 0, menyusun langkah B1-B2 beserta contoh kode, dan memeriksa error `flutter analyze` serta penjelasan tiap butir code yang tidak dimengerti.
+- **Verifikasi:** saya menjalankan aplikasi dan memeriksa setiap butir "Periksa sendiri".
