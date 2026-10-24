@@ -69,7 +69,7 @@ class DaftarKartu extends StatelessWidget {
           padding: EdgeInsetsGeometry.all(8),
           child: ListTile(
             title: Text(item.judul),
-            subtitle: Text('${item.code} - ${item.penanggungjawab}  ${item.status}'),
+            subtitle: Text('${item.code} - ${item.penanggungjawab ?? 'belum ada penanggung jawab'}  ${item.status}'),
           ),
         );
       },
