@@ -12,3 +12,12 @@ Future<List<ItemBacklog>> ambilSemuaItem() async {
   final List<dynamic> data = jsonDecode(jawaban.body);
   return data.map((json) => ItemBacklog.fromJson(json)).toList();
 }
+
+Future<int> tambahItem(String judul, int poin) async {
+  final jawaban = await http.post(
+    Uri.parse('$alamatServer/item'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({'judul': judul, 'poin': poin}),
+  );
+  return jawaban.statusCode;
+}

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'api.dart';
 
 void main() {
@@ -21,7 +22,7 @@ class ItemBacklog {
     this.status,
     this.penanggung_jawab,
   );
-  factory ItemBacklog.fromJson(Map<String, dynamic> json){
+  factory ItemBacklog.fromJson(Map<String, dynamic> json) {
     return ItemBacklog(
       json['kode'],
       json['judul'],
@@ -67,6 +68,55 @@ class LayarGuyub extends StatefulWidget {
 class _LayarGuyubState extends State<LayarGuyub> {
   late Future<List<ItemBacklog>> muatan = ambilSemuaItem();
 
+  Future<void> bukaFormTambah() async {
+    final teksJudul = TextEditingController();
+    final teksPoin = TextEditingController();
+
+    final simpan = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Kartu baru'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: teksJudul,
+              decoration: const InputDecoration(labelText: 'Judul'),
+            ),
+            TextField(
+              controller: teksPoin,
+              decoration: const InputDecoration(labelText: 'Poin'),
+              keyboardType: TextInputType.number,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
+    );
+
+    final judul = teksJudul.text;
+    final poin = int.tryParse(teksPoin.text) ?? 0;
+    teksJudul.dispose();
+    teksPoin.dispose();
+
+    if (simpan != true) return;
+
+    final kode = await tambahItem(judul, poin);
+    if (!mounted) return;
+    if (kode == 201) {
+      setState(() => muatan = ambilSemuaItem());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,10 +133,14 @@ class _LayarGuyubState extends State<LayarGuyub> {
           return DaftarKartu(items: snapshot.data!);
         },
       ),
+      floatingActionButton: FloatingActionButton(
+        tooltip: 'Tambah kartu',
+        onPressed: bukaFormTambah,
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }
-
 
 class DaftarKartu extends StatelessWidget {
   const DaftarKartu({super.key, required this.items});
