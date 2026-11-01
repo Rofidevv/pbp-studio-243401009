@@ -110,11 +110,28 @@ class _LayarGuyubState extends State<LayarGuyub> {
 
     if (simpan != true) return;
 
-    final kode = await tambahItem(judul, poin);
-    if (!mounted) return;
-    if (kode == 201) {
-      setState(() => muatan = ambilSemuaItem());
+        String pesan;
+    try {
+      final kode = await tambahItem(judul, poin);
+      if (kode == 201) {
+        pesan = 'Kartu ditambahkan';
+        if (!mounted) return;
+        setState((){
+          muatan = ambilSemuaItem();
+        });
+      } else if (kode == 422) {
+        pesan = 'Judul wajib diisi dan poin paling kecil 1';
+      } else {
+        pesan = 'Server menjawab $kode';
+      }
+    } catch (e) {
+      // debugPrint('POST error: $e');
+      pesan = 'Server tidak bisa dihubungi';
     }
+
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(pesan)));
+
   }
 
   @override
