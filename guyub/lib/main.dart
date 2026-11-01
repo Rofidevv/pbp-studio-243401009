@@ -20,6 +20,16 @@ class ItemBacklog {
     this.status,
     this.penanggungjawab,
   );
+  factory ItemBacklog.fromJson(Map<String, dynamic> json){
+    return ItemBacklog(
+      json['code'],
+      json['judul'],
+      json['jenis'],
+      json['poin'],
+      json['status'],
+      json['penanggungjawab'],
+    );
+  }
 }
 
 const daftarItem = [
