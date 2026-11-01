@@ -1,88 +1,110 @@
 import 'package:flutter/material.dart';
+import 'api.dart';
 
 void main() {
   runApp(const MaterialApp(home: LayarGuyub()));
 }
 
 class ItemBacklog {
-  final String code;
+  final String kode;
   final String judul;
   final String jenis;
   final int poin;
   final String status;
-  final String? penanggungjawab;
+  final String? penanggung_jawab;
 
   const ItemBacklog(
-    this.code,
+    this.kode,
     this.judul,
     this.jenis,
     this.poin,
     this.status,
-    this.penanggungjawab,
+    this.penanggung_jawab,
   );
   factory ItemBacklog.fromJson(Map<String, dynamic> json){
     return ItemBacklog(
-      json['code'],
+      json['kode'],
       json['judul'],
       json['jenis'],
       json['poin'],
       json['status'],
-      json['penanggungjawab'],
+      json['penanggung_jawab'],
     );
   }
 }
 
-const daftarItem = [
-  ItemBacklog('GYB-001', 'Halaman menu roti', 'story', 5, 'Done', 'Sekar'),
-  ItemBacklog('GYB-002', 'Form pesanan', 'story', 5, 'Review', 'Bayu'),
-  ItemBacklog(
-    'GYB-003',
-    'Tombol pesan tidak aktif di Safari',
-    'bug',
-    2,
-    'In Progress',
-    'Dimas',
-  ),
-  ItemBacklog(
-    'GYB-004',
-    'Ongkir dihitung per kecamatan',
-    'story',
-    3,
-    'To Do',
-    'Bayu',
-  ),
-  ItemBacklog('GYB-005', 'Foto produk lambat dimuat', 'bug', 2, 'To Do', null),
-];
+// const daftarItem = [
+//   ItemBacklog('GYB-001', 'Halaman menu roti', 'story', 5, 'Done', 'Sekar'),
+//   ItemBacklog('GYB-002', 'Form pesanan', 'story', 5, 'Review', 'Bayu'),
+//   ItemBacklog(
+//     'GYB-003',
+//     'Tombol pesan tidak aktif di Safari',
+//     'bug',
+//     2,
+//     'In Progress',
+//     'Dimas',
+//   ),
+//   ItemBacklog(
+//     'GYB-004',
+//     'Ongkir dihitung per kecamatan',
+//     'story',
+//     3,
+//     'To Do',
+//     'Bayu',
+//   ),
+//   ItemBacklog('GYB-005', 'Foto produk lambat dimuat', 'bug', 2, 'To Do', null),
+// ];
 
 const urutanStatus = ['To Do', 'In Progress', 'Review', 'Done'];
 
-class LayarGuyub extends StatelessWidget {
+class LayarGuyub extends StatefulWidget {
   const LayarGuyub({super.key});
+
+  @override
+  State<LayarGuyub> createState() => _LayarGuyubState();
+}
+
+class _LayarGuyubState extends State<LayarGuyub> {
+  late Future<List<ItemBacklog>> muatan = ambilSemuaItem();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Guyub")),
-      body: DaftarKartu(),
+      appBar: AppBar(title: const Text('Guyub')),
+      body: FutureBuilder<List<ItemBacklog>>(
+        future: muatan,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Gagal memuat: ${snapshot.error}'));
+          }
+          return DaftarKartu(items: snapshot.data!);
+        },
+      ),
     );
   }
 }
 
+
 class DaftarKartu extends StatelessWidget {
-  const DaftarKartu({super.key});
+  const DaftarKartu({super.key, required this.items});
+
+  final List<ItemBacklog> items;
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: daftarItem.length,
+      itemCount: items.length,
       itemBuilder: (context, i) {
-        final item = daftarItem[i];
+        final item = items[i];
         return Padding(
           padding: EdgeInsetsGeometry.all(8),
           child: ListTile(
             title: Text(item.judul),
             subtitle: Text(
-              '${item.code} - ${item.penanggungjawab ?? 'belum ada penanggung jawab'}  ${item.status}',
+              '${item.kode} - ${item.penanggung_jawab ?? 'belum ada penanggung jawab'}  ${item.status}',
             ),
             onTap: () => Navigator.push(
               context,
@@ -109,13 +131,13 @@ class _DetailKartuState extends State<DetailKartu> {
   @override
   Widget build(BuildContext context) {
     final sdhDone = status == 'Done';
-    final tnpPenangungJawab = widget.item.penanggungjawab == null;
+    final tnpPenangungJawab = widget.item.penanggung_jawab == null;
     final labelTombol = sdhDone
         ? 'Sudah Done'
         : 'Pindah ke ${urutanStatus[urutanStatus.indexOf(status) + 1]}';
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.item.code)),
+      appBar: AppBar(title: Text(widget.item.kode)),
       body: Padding(
         padding: EdgeInsetsGeometry.all(8),
         child: Column(
@@ -123,12 +145,12 @@ class _DetailKartuState extends State<DetailKartu> {
           children: [
             Text(widget.item.judul),
             Text(
-              '${widget.item.code} . ${widget.item.jenis} . '
+              '${widget.item.kode} . ${widget.item.jenis} . '
               '${widget.item.poin} poin',
             ),
             Text(
               'Penangung Jawab: '
-              '${widget.item.penanggungjawab ?? 'belum ada penangung jawab'}',
+              '${widget.item.penanggung_jawab ?? 'belum ada penangung jawab'}',
             ),
             Text('Status: $status'),
             ElevatedButton(
