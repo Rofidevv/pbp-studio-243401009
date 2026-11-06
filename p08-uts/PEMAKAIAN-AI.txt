@@ -1,0 +1,2 @@
+Memakai AI: Claude (omp).
+Untuk U1–U6: meminta panduan langkah, kode jawaban lengkap tiap langkah beserta penjelasannya, dan pemeriksaan kode per langkah. Kode saya ketik dan jalankan sendiri di lib/main.dart.
