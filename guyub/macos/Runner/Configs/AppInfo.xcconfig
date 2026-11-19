@@ -8,7 +8,7 @@
 PRODUCT_NAME = guyub
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.guyub
+PRODUCT_BUNDLE_IDENTIFIER = id.ac.ukdc.guyub
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 id.ac.ukdc. All rights reserved.

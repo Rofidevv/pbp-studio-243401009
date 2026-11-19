@@ -1,27 +1,30 @@
 import 'package:flutter/material.dart';
-
 import 'api.dart';
 
+// A1: bungkus MaterialApp di sini.
 void main() {
-  runApp(const MaterialApp(home: LayarGuyub()));
+  runApp(const MaterialApp(home: LayarPapan()));
 }
 
+// Class ItemBacklog
 class ItemBacklog {
   final String kode;
   final String judul;
   final String jenis;
   final int poin;
-  final String status;
-  final String? penanggung_jawab;
+  String status; // Bisa berubah, dipakai di A4.
+  final String? penanggungJawab;
 
-  const ItemBacklog(
+  ItemBacklog(
     this.kode,
     this.judul,
     this.jenis,
     this.poin,
     this.status,
-    this.penanggung_jawab,
+    this.penanggungJawab,
   );
+
+  // Nama di server (penanggung_jawab) boleh berbeda dari nama field di Dart.
   factory ItemBacklog.fromJson(Map<String, dynamic> json) {
     return ItemBacklog(
       json['kode'],
@@ -34,44 +37,21 @@ class ItemBacklog {
   }
 }
 
-// const daftarItem = [
-//   ItemBacklog('GYB-001', 'Halaman menu roti', 'story', 5, 'Done', 'Sekar'),
-//   ItemBacklog('GYB-002', 'Form pesanan', 'story', 5, 'Review', 'Bayu'),
-//   ItemBacklog(
-//     'GYB-003',
-//     'Tombol pesan tidak aktif di Safari',
-//     'bug',
-//     2,
-//     'In Progress',
-//     'Dimas',
-//   ),
-//   ItemBacklog(
-//     'GYB-004',
-//     'Ongkir dihitung per kecamatan',
-//     'story',
-//     3,
-//     'To Do',
-//     'Bayu',
-//   ),
-//   ItemBacklog('GYB-005', 'Foto produk lambat dimuat', 'bug', 2, 'To Do', null),
-// ];
-
-const urutanStatus = ['To Do', 'In Progress', 'Review', 'Done'];
-
-class LayarGuyub extends StatefulWidget {
-  const LayarGuyub({super.key});
+// A2: FutureBuilder diganti dengan data dari PapanModel.
+class LayarPapan extends StatefulWidget {
+  const LayarPapan({super.key});
 
   @override
-  State<LayarGuyub> createState() => _LayarGuyubState();
+  State<LayarPapan> createState() => _LayarPapanState();
 }
 
-class _LayarGuyubState extends State<LayarGuyub> {
+class _LayarPapanState extends State<LayarPapan> {
   late Future<List<ItemBacklog>> muatan = ambilSemuaItem();
 
+  // Form kartu baru, lalu pesan menurut kode status.
   Future<void> bukaFormTambah() async {
-    final teksJudul = TextEditingController();
-    final teksPoin = TextEditingController();
-
+    final judul = TextEditingController();
+    final poin = TextEditingController();
     final simpan = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -80,11 +60,11 @@ class _LayarGuyubState extends State<LayarGuyub> {
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
-              controller: teksJudul,
+              controller: judul,
               decoration: const InputDecoration(labelText: 'Judul'),
             ),
             TextField(
-              controller: teksPoin,
+              controller: poin,
               decoration: const InputDecoration(labelText: 'Poin'),
               keyboardType: TextInputType.number,
             ),
@@ -95,43 +75,31 @@ class _LayarGuyubState extends State<LayarGuyub> {
             onPressed: () => Navigator.pop(context, false),
             child: const Text('Batal'),
           ),
-          TextButton(
+          FilledButton(
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Simpan'),
           ),
         ],
       ),
     );
-
-    final judul = teksJudul.text;
-    final poin = int.tryParse(teksPoin.text) ?? 0;
-    teksJudul.dispose();
-    teksPoin.dispose();
-
     if (simpan != true) return;
 
-        String pesan;
+    String pesan;
     try {
-      final kode = await tambahItem(judul, poin);
+      final kode = await tambahItem(judul.text, int.tryParse(poin.text) ?? 0);
       if (kode == 201) {
         pesan = 'Kartu ditambahkan';
-        if (!mounted) return;
-        setState((){
-          muatan = ambilSemuaItem();
-        });
+        setState(() => muatan = ambilSemuaItem());
       } else if (kode == 422) {
         pesan = 'Judul wajib diisi dan poin paling kecil 1';
       } else {
         pesan = 'Server menjawab $kode';
       }
     } catch (e) {
-      // debugPrint('POST error: $e');
       pesan = 'Server tidak bisa dihubungi';
     }
-
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(pesan)));
-
   }
 
   @override
@@ -151,8 +119,8 @@ class _LayarGuyubState extends State<LayarGuyub> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        tooltip: 'Tambah kartu',
         onPressed: bukaFormTambah,
+        tooltip: 'Tambah kartu',
         child: const Icon(Icons.add),
       ),
     );
@@ -170,75 +138,15 @@ class DaftarKartu extends StatelessWidget {
       itemCount: items.length,
       itemBuilder: (context, i) {
         final item = items[i];
-        return Padding(
-          padding: EdgeInsetsGeometry.all(8),
-          child: ListTile(
-            title: Text(item.judul),
-            subtitle: Text(
-              '${item.kode} - ${item.penanggung_jawab ?? 'belum ada penanggung jawab'}  ${item.status}',
-            ),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => DetailKartu(item: item)),
-            ),
+        return ListTile(
+          title: Text(item.judul),
+          subtitle: Text(
+            '${item.kode} · ${item.penanggungJawab ?? 'belum ada penanggung jawab'}',
           ),
+          trailing: Text(item.status),
+          // A3: onTap ditulis di sini.
         );
       },
-    );
-  }
-}
-
-class DetailKartu extends StatefulWidget {
-  const DetailKartu({super.key, required this.item});
-  final ItemBacklog item;
-
-  @override
-  State<DetailKartu> createState() => _DetailKartuState();
-}
-
-class _DetailKartuState extends State<DetailKartu> {
-  late String status = widget.item.status;
-
-  @override
-  Widget build(BuildContext context) {
-    final sdhDone = status == 'Done';
-    final tnpPenangungJawab = widget.item.penanggung_jawab == null;
-    final labelTombol = sdhDone
-        ? 'Sudah Done'
-        : 'Pindah ke ${urutanStatus[urutanStatus.indexOf(status) + 1]}';
-
-    return Scaffold(
-      appBar: AppBar(title: Text(widget.item.kode)),
-      body: Padding(
-        padding: EdgeInsetsGeometry.all(8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(widget.item.judul),
-            Text(
-              '${widget.item.kode} . ${widget.item.jenis} . '
-              '${widget.item.poin} poin',
-            ),
-            Text(
-              'Penangung Jawab: '
-              '${widget.item.penanggung_jawab ?? 'belum ada penangung jawab'}',
-            ),
-            Text('Status: $status'),
-            ElevatedButton(
-              onPressed: (sdhDone || tnpPenangungJawab)
-                  ? null
-                  : () {
-                      setState(() {
-                        status = urutanStatus[urutanStatus.indexOf(status) + 1];
-                      });
-                    },
-              child: Text(labelTombol),
-            ),
-            if (tnpPenangungJawab)
-              Text('Kartu tanpa penangung jawab tidak bisa dipindahk'),
-          ],
-        ),
-      ),
     );
   }
 }
