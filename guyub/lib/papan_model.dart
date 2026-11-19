@@ -34,5 +34,8 @@ class PapanModel extends ChangeNotifier {
 
   void ubahStatus(String kode, String statusBaru) {
     // A4: tulis di sini.
+    final item = _items.firstWhere((item) => item.kode == kode);
+    item.status = statusBaru;
+    notifyListeners();
   }
 }

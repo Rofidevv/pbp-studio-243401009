@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:guyub/papan_model.dart';
+import 'package:provider/provider.dart';
 
 import 'main.dart';
 
@@ -31,7 +33,10 @@ class DetailKartu extends StatelessWidget {
             Text('Status: ${item.status}'),
             if (berikutnya != null)
               FilledButton(
-                onPressed: null, // A4: ganti null.
+                onPressed: () => context.watch<PapanModel>().ubahStatus(
+                  item.kode,
+                  berikutnya,
+                ), // A4: ganti null.
                 child: Text('Pindah ke $berikutnya'),
               ),
             // B1: tombol Selesai ditulis di sini.
