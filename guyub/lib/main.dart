@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+
 import 'api.dart';
+
+import 'package:provider/provider.dart';
+import 'papan_model.dart';
 
 // A1: bungkus MaterialApp di sini.
 void main() {
-  runApp(const MaterialApp(home: LayarPapan()));
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => PapanModel()..muat(),
+      child: const MaterialApp(home: LayarPapan()),
+    ),
+  );
 }
 
 // Class ItemBacklog
