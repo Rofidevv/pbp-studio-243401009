@@ -30,7 +30,23 @@ Future<int> tambahItem(String judul, int poin) async {
 Future<List<ItemBacklog>> ambilContoh() async => [
   ItemBacklog('GYB-001', 'Halaman menu roti', 'story', 5, 'Done', 'Sekar'),
   ItemBacklog('GYB-002', 'Form pesanan', 'story', 5, 'Review', 'Bayu'),
-  ItemBacklog('GYB-003', 'Tombol pesan tidak aktif', 'bug', 2, 'In Progress', 'Dimas'),
+  ItemBacklog(
+    'GYB-003',
+    'Tombol pesan tidak aktif',
+    'bug',
+    2,
+    'In Progress',
+    'Dimas',
+  ),
   ItemBacklog('GYB-004', 'Ongkir per kecamatan', 'story', 3, 'To Do', 'Bayu'),
   ItemBacklog('GYB-005', 'Foto produk lambat dimuat', 'bug', 2, 'To Do', null),
 ];
+
+Future<int> ubahStatusDiServer(String kode, String status) async {
+  final jawaban = await http.patch(
+    Uri.parse('$alamatServer/item/$kode'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({'status': status}),
+  );
+  return jawaban.statusCode;
+}
